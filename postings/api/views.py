@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import generics, mixins
 
 from postings.models import BlogPost
@@ -9,7 +10,16 @@ class BlogPostAPIView(mixins.CreateModelMixin ,generics.ListAPIView):
     serializer_class = BlogPostSerializer
 
     def get_queryset(self):
-        return BlogPost.objects.all()
+        qs = BlogPost.objects.all()
+        query = self.request.GET.get("q")
+
+        if query:
+            qs = qs.filter(
+                Q(title__icontains=query)
+                | Q(content__icontains=query)
+            ).distinct()
+
+        return qs
 
     # Handled by CreateModelMixin
     def post(self, request, *args, **kwargs):
