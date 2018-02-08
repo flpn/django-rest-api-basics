@@ -10,3 +10,7 @@ class BlogPost(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    @property
+    def owner(self):
+        return self.user
